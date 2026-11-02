@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0c0c0d">
-  <title>Outils gratuits : mot de passe, calculatrice, bloc-notes | Rwagaza Tech Solution</title>
-  <meta name="description" content="Six outils gratuits : générateur de mot de passe, convertisseur d'octets, calculatrice réseau, calculatrice, bloc-notes et convertisseur de texte.">
+  <title>Outils gratuits : mot de passe, lien WhatsApp, devises | Rwagaza Tech Solution</title>
+  <meta name="description" content="Outils gratuits : générateur et vérificateur de mot de passe, lien WhatsApp, convertisseur dollars et francs congolais, octets, calculatrice réseau, calculatrice, bloc-notes et convertisseur de texte.">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="stylesheet" href="style.css">
@@ -13,8 +13,24 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Rwagaza Tech">
   <style>
-    .mdp-sortie { user-select:text; -webkit-user-select:text; }
+    .chips { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 4px; }
+    .chips a { border:1px solid var(--or); color:var(--or); border-radius:20px; padding:4px 12px; text-decoration:none; font-size:.85rem; }
+    .chips a:hover { background:var(--or); color:#111; }
+    .outil input[type="password"], .outil input[type="number"] { width:100%; background:#0c0c0d; color:#fff; border:1px solid var(--bord); border-radius:10px; padding:12px; font-size:1rem; font-family:inherit; }
+    .outil input[type="password"]:focus { outline:2px solid var(--or); }
+    .outil .bouton.vide { border:1px solid var(--or); }
+    .mdp-ligne { display:flex; gap:8px; align-items:center; justify-content:space-between; background:#0c0c0d; border:1px solid var(--bord); border-radius:10px; padding:8px 10px; margin:6px 0; }
+    .mdp-ligne code { font-family:monospace; font-size:1.05rem; color:#fff; word-break:break-all; user-select:text; -webkit-user-select:text; }
+    .mdp-ligne button { flex:none; background:transparent; color:var(--or); border:1px solid var(--or); border-radius:16px; padding:4px 12px; cursor:pointer; }
+    .jauge { background:#2b2b2e; border-radius:10px; height:10px; overflow:hidden; margin:10px 0 6px; }
+    .jauge div { height:100%; width:0; background:#d93025; transition:width .3s, background .3s; }
+    .sep { border:0; border-top:1px solid var(--bord); margin:20px 0; }
+    .champ-mdp { display:flex; gap:8px; }
+    .champ-mdp input { flex:1; }
+    .champ-mdp button { flex:none; background:transparent; border:1px solid var(--bord); border-radius:10px; padding:0 14px; cursor:pointer; font-size:1.1rem; }
     .info-tech { font-size:.85rem; color:var(--gris); word-break:break-word; white-space:pre-wrap; }
+    :root[data-theme="clair"] .mdp-ligne, :root[data-theme="clair"] .outil input[type="password"], :root[data-theme="clair"] .outil input[type="number"] { background:#fff; color:var(--texte); }
+    :root[data-theme="clair"] .mdp-ligne code { color:var(--texte); }
   </style>
 </head>
 <body>
@@ -33,411 +49,56 @@
 
   <main>
     <h2>Outils gratuits</h2>
-    <p class="sous-titre">Six outils utiles. Tout se calcule sur ton téléphone : rien n'est envoyé nulle part, et aucun mot de passe n'est enregistré.</p>
+    <p class="sous-titre">Huit outils utiles. Tout se calcule sur ton téléphone : rien n'est envoyé nulle part, et aucun mot de passe n'est enregistré.</p>
+    <div class="chips">
+      <a href="#outil-mdp">Mot de passe</a>
+      <a href="#outil-wa">Lien WhatsApp</a>
+      <a href="#outil-dev">Devises</a>
+      <a href="#outil-conv">Octets</a>
+      <a href="#outil-cidr">Réseau</a>
+      <a href="#outil-calc">Calculatrice</a>
+      <a href="#outil-notes">Notes</a>
+      <a href="#outil-texte">Texte</a>
+    </div>
 
     <section class="carte outil" id="outil-mdp" aria-labelledby="t-mdp">
-      <h3 id="t-mdp">🔐 Générateur de mot de passe</h3>
+      <h3 id="t-mdp">🔐 Mot de passe : générer et vérifier</h3>
+
+      <label for="mdp-mode">Type</label>
+      <select id="mdp-mode">
+        <option value="mdp">Mot de passe</option>
+        <option value="pin">Code PIN (chiffres seulement)</option>
+      </select>
+
       <label for="mdp-long">Longueur : <b id="mdp-long-val">16</b> caractères</label>
       <input id="mdp-long" type="range" min="8" max="64" value="16">
-      <label class="case"><input type="checkbox" id="mdp-maj" checked> Majuscules</label>
-      <label class="case"><input type="checkbox" id="mdp-min" checked> Minuscules</label>
-      <label class="case"><input type="checkbox" id="mdp-chi" checked> Chiffres</label>
-      <label class="case"><input type="checkbox" id="mdp-sym" checked> Symboles</label>
-      <div class="resultat"><div class="mdp-sortie" id="mdp-sortie">…</div></div>
+
+      <div id="mdp-options">
+        <label class="case"><input type="checkbox" id="mdp-maj" checked> Majuscules</label>
+        <label class="case"><input type="checkbox" id="mdp-min" checked> Minuscules</label>
+        <label class="case"><input type="checkbox" id="mdp-chi" checked> Chiffres</label>
+        <label class="case"><input type="checkbox" id="mdp-sym" checked> Symboles</label>
+        <label class="case"><input type="checkbox" id="mdp-clair" checked> Éviter les caractères qui se ressemblent (I, l, 1, O, 0)</label>
+      </div>
+
+      <label for="mdp-nb">Nombre de résultats</label>
+      <select id="mdp-nb">
+        <option value="1">1</option>
+        <option value="3" selected>3</option>
+        <option value="5">5</option>
+        <option value="10">10</option>
+      </select>
+
+      <div class="mdp-liste" id="mdp-liste"></div>
+      <div class="jauge"><div id="mdp-jauge"></div></div>
       <p class="sous-titre" id="mdp-force"></p>
       <p class="erreur" id="mdp-erreur" role="alert"></p>
       <p class="source" id="mdp-securite"></p>
-      <button class="bouton" id="mdp-generer" type="button">Générer</button>
-      <button class="bouton vide" id="mdp-copier" type="button">Copier</button>
-      <p class="source">Les caractères qui se ressemblent (I, l, 1, O, 0) sont exclus pour éviter les erreurs de recopie.</p>
-    </section>
+      <button class="bouton" id="mdp-generer" type="button">Générer de nouveaux</button>
+      <p class="source">Range tes mots de passe dans un gestionnaire de mots de passe et utilise un mot de passe différent pour chaque compte.</p>
 
-    <section class="carte outil" id="outil-conv" aria-labelledby="t-conv">
-      <h3 id="t-conv">💾 Convertisseur d'octets</h3>
-      <label for="conv-valeur">Valeur</label>
-      <input id="conv-valeur" type="text" inputmode="decimal" value="1">
-      <label for="conv-unite">Unité de départ</label>
-      <select id="conv-unite"></select>
-      <label for="conv-base">Système</label>
-      <select id="conv-base">
-        <option value="1000">Décimal (1 Ko = 1 000 octets)</option>
-        <option value="1024">Binaire (1 Kio = 1 024 octets)</option>
-      </select>
-      <div class="resultat" id="conv-sortie"></div>
-      <p class="source">Les fabricants de stockage utilisent le système décimal ; les systèmes d'exploitation affichent souvent le binaire, d'où les petites différences de capacité.</p>
-    </section>
-
-    <section class="carte outil" id="outil-cidr" aria-labelledby="t-cidr">
-      <h3 id="t-cidr">🌐 Calculatrice réseau (IPv4)</h3>
-      <label for="cidr-entree">Adresse IP et préfixe</label>
-      <input id="cidr-entree" type="text" inputmode="text" value="192.168.1.10/24" placeholder="192.168.1.10/24" autocomplete="off">
-      <p class="erreur" id="cidr-erreur" role="alert"></p>
-      <button class="bouton" id="cidr-calculer" type="button">Calculer</button>
-      <div class="resultat" id="cidr-sortie"></div>
-      <p class="source">Le préfixe (par exemple /24) indique combien de bits appartiennent au réseau. Plus il est grand, plus le réseau est petit.</p>
-    </section>
-
-    <section class="carte outil" id="outil-calc" aria-labelledby="t-calc">
-      <h3 id="t-calc">🧮 Calculatrice</h3>
-      <div class="calc-sous" id="calc-sous"></div>
-      <div class="calc-ecran" id="calc-ecran" aria-live="polite">0</div>
-      <div class="calc-grille" id="calc-grille"></div>
-      <p class="source">Elle respecte les priorités (la multiplication et la division passent avant l'addition et la soustraction) et accepte les parenthèses.</p>
-    </section>
-
-    <section class="carte outil" id="outil-notes" aria-labelledby="t-notes">
-      <h3 id="t-notes">📝 Bloc-notes</h3>
-      <textarea id="notes" class="notes" placeholder="Écris tes notes ici. Elles restent sur cet appareil."></textarea>
-      <p class="stats" id="notes-stats"></p>
-      <div class="outils-rangee">
-        <button id="notes-copier" type="button">Copier</button>
-        <button id="notes-telecharger" type="button">Télécharger (.txt)</button>
-        <button id="notes-effacer" type="button">Effacer</button>
-      </div>
-      <p class="source">Tes notes sont enregistrées automatiquement dans ce navigateur, jamais sur un serveur. Si tu effaces les données du navigateur, elles disparaissent : télécharge les notes importantes.</p>
-    </section>
-
-    <section class="carte outil" id="outil-texte" aria-labelledby="t-texte">
-      <h3 id="t-texte">🔤 Convertisseur de texte</h3>
-      <label for="txt-entree">Ton texte</label>
-      <textarea id="txt-entree" class="conv-texte" placeholder="Colle ou écris ton texte..."></textarea>
-      <p class="stats" id="txt-stats"></p>
-      <div class="outils-rangee" id="txt-boutons"></div>
-      <label for="txt-sortie">Résultat</label>
-      <textarea id="txt-sortie" class="conv-texte" readonly></textarea>
-      <div class="outils-rangee">
-        <button id="txt-copier" type="button">Copier le résultat</button>
-        <button id="txt-reprendre" type="button">Réutiliser le résultat</button>
-      </div>
-    </section>
-
-    <details class="carte" id="infos">
-      <summary>Informations techniques</summary>
-      <p class="info-tech" id="infos-texte"></p>
-    </details>
-  </main>
-
-  <a class="wa-flottant" href="https://wa.me/243967811702" target="_blank" rel="noopener" aria-label="Me contacter sur WhatsApp">💬 WhatsApp</a>
-
-  <footer>
-    <p class="langues">
-      <a href="/" aria-current="true">Français</a>
-      <a href="/en/">English</a>
-      <a href="/es/">Español</a>
-      <a href="/pt/">Português</a>
-    </p>
-    <p>
-      <a href="index.html">Accueil</a>
-      <a href="projets.html">Projets</a>
-      <a href="apprendre.html">Apprendre</a>
-      <a href="galerie.html">Galerie</a>
-      <a href="outils.html">Outils</a>
-      <a href="a-propos.html">À propos</a>
-      <a href="contact.html">Contact</a>
-    </p>
-    <p><a href="confidentialite.html">Mentions légales et confidentialité</a></p>
-    <p>© 2026 Rwagaza Tech Solution</p>
-  </footer>
-
-  <script>
-    (function () {
-      var VERSION_PAGE = "outils v14";
-      var erreursPage = [];
-
-      /* ===== Informations techniques (pour comprendre un problème) ===== */
-      function majInfos() {
-        var zone = document.getElementById("infos-texte");
-        if (!zone) return;
-        var ls = "non";
-        try { localStorage.setItem("test-rts", "1"); localStorage.removeItem("test-rts"); ls = "oui"; } catch (e) {}
-        var lignes = [
-          "Page : " + VERSION_PAGE,
-          "Générateur aléatoire sécurisé : " + (window.crypto && window.crypto.getRandomValues ? "oui" : "non (mode de secours)"),
-          "Stockage local : " + ls,
-          "Presse-papiers : " + (navigator.clipboard ? "oui" : "non (copie de secours)"),
-          "Service worker : " + ("serviceWorker" in navigator ? "oui" : "non"),
-          "Connexion sécurisée (HTTPS) : " + (location.protocol === "https:" ? "oui" : "non"),
-          "Navigateur : " + navigator.userAgent,
-          "Erreurs : " + (erreursPage.length ? erreursPage.join(" | ") : "aucune")
-        ];
-        zone.textContent = lignes.join("\n");
-      }
-
-      window.addEventListener("error", function (e) {
-        erreursPage.push((e.message || "erreur") + (e.lineno ? " (ligne " + e.lineno + ")" : ""));
-        majInfos();
-      });
-
-      /* ===== Protège chaque outil : une erreur n'arrête pas les autres ===== */
-      function essayer(idCarte, fonction) {
-        try { fonction(); } catch (e) {
-          var message = e && e.message ? e.message : String(e);
-          erreursPage.push(idCarte + " : " + message);
-          var carte = document.getElementById(idCarte);
-          if (carte) {
-            var p = document.createElement("p");
-            p.className = "erreur";
-            p.textContent = "Cet outil a rencontré un problème : " + message;
-            carte.appendChild(p);
-          }
-        }
-      }
-
-      /* ===== Copier dans le presse-papiers, avec un secours ===== */
-      function copier(texte, btn, libelle) {
-        if (!texte) return;
-        function fini(ok) {
-          btn.textContent = ok ? "Copié ✓" : "Copie impossible : sélectionne le texte";
-          setTimeout(function () { btn.textContent = libelle; }, 2000);
-        }
-        function secours() {
-          var ta = document.createElement("textarea");
-          ta.value = texte;
-          ta.setAttribute("readonly", "");
-          ta.style.position = "fixed";
-          ta.style.opacity = "0";
-          document.body.appendChild(ta);
-          ta.select();
-          try { ta.setSelectionRange(0, texte.length); } catch (e) {}
-          var ok = false;
-          try { ok = document.execCommand("copy"); } catch (e) {}
-          document.body.removeChild(ta);
-          fini(ok);
-        }
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(texte).then(function () { fini(true); }).catch(secours);
-        } else {
-          secours();
-        }
-      }
-
-      function statsTexte(t) {
-        var mots = t.trim() ? t.trim().split(/\s+/).length : 0;
-        var lignes = t ? t.split("\n").length : 0;
-        return mots + " mots · " + t.length + " caractères · " + lignes + " lignes";
-      }
-
-      /* ===== 1. Générateur de mot de passe ===== */
-      essayer("outil-mdp", function () {
-        var longEl = document.getElementById("mdp-long");
-        var longVal = document.getElementById("mdp-long-val");
-        var cMaj = document.getElementById("mdp-maj");
-        var cMin = document.getElementById("mdp-min");
-        var cChi = document.getElementById("mdp-chi");
-        var cSym = document.getElementById("mdp-sym");
-        var sortie = document.getElementById("mdp-sortie");
-        var force = document.getElementById("mdp-force");
-        var erreurMdp = document.getElementById("mdp-erreur");
-        var securite = document.getElementById("mdp-securite");
-
-        var rngSur = !!(window.crypto && window.crypto.getRandomValues);
-        if (!rngSur) {
-          securite.textContent = "Ton navigateur n'offre pas de générateur aléatoire sécurisé : ce mot de passe est moins fort. Mets à jour ton navigateur (ou Android System WebView).";
-        }
-
-        function alea(n) {
-          if (rngSur) {
-            var t = new Uint32Array(1);
-            var limite = Math.floor(4294967296 / n) * n;
-            do { window.crypto.getRandomValues(t); } while (t[0] >= limite);
-            return t[0] % n;
-          }
-          return Math.floor(Math.random() * n);
-        }
-
-        function generer() {
-          var longueur = parseInt(longEl.value, 10) || 16;
-          longVal.textContent = longueur;
-          var jeux = [];
-          if (cMaj.checked) jeux.push("ABCDEFGHJKLMNPQRSTUVWXYZ");
-          if (cMin.checked) jeux.push("abcdefghijkmnopqrstuvwxyz");
-          if (cChi.checked) jeux.push("23456789");
-          if (cSym.checked) jeux.push("!@#$%&*?-_=+");
-          if (!jeux.length) {
-            sortie.textContent = "—";
-            force.textContent = "";
-            erreurMdp.textContent = "Choisis au moins un type de caractère.";
-            return;
-          }
-          erreurMdp.textContent = "";
-          var tout = jeux.join("");
-          var res = [];
-          jeux.forEach(function (j) { res.push(j.charAt(alea(j.length))); });
-          while (res.length < longueur) res.push(tout.charAt(alea(tout.length)));
-          for (var i = res.length - 1; i > 0; i--) {
-            var k = alea(i + 1);
-            var tmp = res[i]; res[i] = res[k]; res[k] = tmp;
-          }
-          sortie.textContent = res.join("");
-          var bits = longueur * Math.log(tout.length) / Math.log(2);
-          var niveau = bits < 40 ? "faible" : bits < 60 ? "moyenne" : bits < 80 ? "forte" : "très forte";
-          force.textContent = "Force : " + niveau + " (environ " + Math.round(bits) + " bits)";
-        }
-
-        longEl.oninput = generer;
-        [cMaj, cMin, cChi, cSym].forEach(function (c) { c.onchange = generer; });
-        document.getElementById("mdp-generer").onclick = generer;
-        document.getElementById("mdp-copier").onclick = function () {
-          var t = sortie.textContent;
-          if (t && t !== "—" && t !== "…") copier(t, this, "Copier");
-        };
-        generer();
-      });
-
-      /* ===== 2. Convertisseur d'octets ===== */
-      essayer("outil-conv", function () {
-        var valeur = document.getElementById("conv-valeur");
-        var uniteSel = document.getElementById("conv-unite");
-        var baseSel = document.getElementById("conv-base");
-        var sortieConv = document.getElementById("conv-sortie");
-        var NOMS_DEC = ["octet", "Ko", "Mo", "Go", "To"];
-        var NOMS_BIN = ["octet", "Kio", "Mio", "Gio", "Tio"];
-
-        function majUnites() {
-          var base = parseInt(baseSel.value, 10);
-          var noms = base === 1024 ? NOMS_BIN : NOMS_DEC;
-          var i = uniteSel.selectedIndex < 0 ? 2 : uniteSel.selectedIndex;
-          uniteSel.innerHTML = "";
-          noms.forEach(function (n, k) {
-            var o = document.createElement("option");
-            o.value = k;
-            o.textContent = n;
-            uniteSel.appendChild(o);
-          });
-          uniteSel.selectedIndex = i;
-        }
-
-        function convertir() {
-          var base = parseInt(baseSel.value, 10);
-          var noms = base === 1024 ? NOMS_BIN : NOMS_DEC;
-          var v = parseFloat(valeur.value.replace(",", "."));
-          sortieConv.textContent = "";
-          if (isNaN(v) || v < 0) {
-            sortieConv.textContent = "Entre un nombre positif.";
-            return;
-          }
-          var octets = v * Math.pow(base, parseInt(uniteSel.value, 10));
-          noms.forEach(function (nom, k) {
-            var d = document.createElement("div");
-            var s = document.createElement("span");
-            s.textContent = nom;
-            var b = document.createElement("b");
-            b.textContent = (octets / Math.pow(base, k)).toLocaleString("fr-FR", { maximumFractionDigits: 6 });
-            d.appendChild(s);
-            d.appendChild(b);
-            sortieConv.appendChild(d);
-          });
-        }
-
-        valeur.oninput = convertir;
-        uniteSel.onchange = convertir;
-        baseSel.onchange = function () { majUnites(); convertir(); };
-        majUnites();
-        uniteSel.selectedIndex = 2;
-        convertir();
-      });
-
-      /* ===== 3. Calculatrice réseau ===== */
-      essayer("outil-cidr", function () {
-        var cidrEl = document.getElementById("cidr-entree");
-        var cidrSortie = document.getElementById("cidr-sortie");
-        var cidrErreur = document.getElementById("cidr-erreur");
-
-        function versIp(n) {
-          return [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join(".");
-        }
-        function ligne(nom, val) {
-          var d = document.createElement("div");
-          var s = document.createElement("span");
-          s.textContent = nom;
-          var b = document.createElement("b");
-          b.textContent = val;
-          d.appendChild(s);
-          d.appendChild(b);
-          cidrSortie.appendChild(d);
-        }
-
-        function calculerReseau() {
-          cidrSortie.textContent = "";
-          var m = /^\s*(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})\s*$/.exec(cidrEl.value);
-          if (!m) {
-            cidrErreur.textContent = "Format attendu : 192.168.1.10/24";
-            return;
-          }
-          var o = [+m[1], +m[2], +m[3], +m[4]];
-          var p = +m[5];
-          if (o.some(function (x) { return x > 255; }) || p > 32) {
-            cidrErreur.textContent = "Adresse ou préfixe invalide (octets de 0 à 255, préfixe de 0 à 32).";
-            return;
-          }
-          cidrErreur.textContent = "";
-
-          var ip = o[0] * 16777216 + o[1] * 65536 + o[2] * 256 + o[3];
-          var masque = p === 0 ? 0 : (0xFFFFFFFF << (32 - p)) >>> 0;
-          var reseau = (ip & masque) >>> 0;
-          var diffusion = (reseau | ((~masque) >>> 0)) >>> 0;
-          var total = Math.pow(2, 32 - p);
-          var premier, dernier, hotes;
-          if (p <= 30) { premier = reseau + 1; dernier = diffusion - 1; hotes = total - 2; }
-          else if (p === 31) { premier = reseau; dernier = diffusion; hotes = 2; }
-          else { premier = ip; dernier = ip; hotes = 1; }
-
-          var type = "Publique";
-          if (o[0] === 10 || (o[0] === 172 && o[1] >= 16 && o[1] <= 31) || (o[0] === 192 && o[1] === 168)) type = "Privée";
-          else if (o[0] === 127) type = "Boucle locale (cet appareil)";
-          else if (o[0] === 169 && o[1] === 254) type = "Adresse automatique (APIPA)";
-
-          ligne("Masque", versIp(masque) + " (/" + p + ")");
-          ligne("Adresse réseau", versIp(reseau));
-          ligne("Première adresse", versIp(premier));
-          ligne("Dernière adresse", versIp(dernier));
-          ligne("Diffusion (broadcast)", versIp(diffusion));
-          ligne("Hôtes utilisables", hotes.toLocaleString("fr-FR"));
-          ligne("Type d'adresse", type);
-        }
-
-        document.getElementById("cidr-calculer").onclick = calculerReseau;
-        cidrEl.onkeydown = function (e) { if (e.key === "Enter") calculerReseau(); };
-        calculerReseau();
-      });
-
-      /* ===== 4. Calculatrice ===== */
-      essayer("outil-calc", function () {
-        var calcEcran = document.getElementById("calc-ecran");
-        var calcSous = document.getElementById("calc-sous");
-        var calcGrille = document.getElementById("calc-grille");
-        var expression = "";
-        var apresResultat = false;
-
-        // Évalue une expression sans utiliser eval (plus sûr)
-        function evaluer(texte) {
-          var s = texte.replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-").replace(/\s/g, "");
-          var p = 0;
-          function expr() {
-            var v = terme();
-            while (p < s.length && (s[p] === "+" || s[p] === "-")) {
-              var op = s[p++];
-              var w = terme();
-              v = op === "+" ? v + w : v - w;
-            }
-            return v;
-          }
-          function terme() {
-            var v = facteur();
-            while (p < s.length && (s[p] === "*" || s[p] === "/")) {
-              var op = s[p++];
-              var w = facteur();
-              if (op === "/" && w === 0) throw new Error("division par zéro");
-              v = op === "*" ? v * w : v / w;
-            }
-            return v;
-          }
-          function facteur() {
-            if (s[p] === "-") { p++; return -facteur(); }
-            if (s[p] === "+") { p++; return facteur(); }
-            if (s[p] === "(") {
-              p++;
-              var v = expr();
-              if (s[p] !== ")") throw new Error("parenthèse");
-              p++;
-     
+      <hr class="sep">
+      <h4 style="margin:0 0 6px;color:#fff;">Vérifier un mot de passe</h4>
+      <label for="vf-mdp">Ton mot de passe (il reste sur ton téléphone)</label>
+      <div class="champ-mdp">
+        <input id="
