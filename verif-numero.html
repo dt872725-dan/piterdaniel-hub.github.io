@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Vérification du numéro</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .ok { color:#7ee787; }
+    .ko { color:#ff8a80; font-weight:bold; }
+    .gris { color:var(--gris); }
+    .liste-v { list-style:none; padding:0; margin:0; }
+    .liste-v li { padding:6px 0; border-bottom:1px solid #1f1f22; word-break:break-all; }
+    .extrait { font-family:monospace; font-size:.8rem; color:#ccc; margin:2px 0 0; }
+  </style>
+</head>
+<body>
+  <header><h1>Vérification du numéro</h1></header>
+  <main>
+    <p class="sous-titre">Cette page lit chaque fichier de ton site et cherche l'ancien numéro WhatsApp. Elle ne change rien : elle te dit où corriger.</p>
+    <div class="carte" id="resume">Test en cours...</div>
+    <div class="carte"><ul class="liste-v" id="liste"></ul></div>
+  </main>
+
+  <script>
+    (function () {
+      var FICHIERS = [
+        "index.html", "projets.html", "projet.html", "apprendre.html", "galerie.html", "outils.html",
+        "tarifs.html", "paiement.html", "a-propos.html", "contact.html", "article1.html",
+        "confidentialite.html", "404.html", "offline.html", "tableau-de-bord.html",
+        "en/index.html", "es/index.html", "pt/index.html",
+        "assistant.js", "site.js", "ia.js", "lecons.js", "galerie.js", "projets-data.js",
+        "publications.js", "progres.js", "sw.js", "manifest.json", "sitemap.xml"
+      ];
+      var ANCIENS = ["898560667", "970521444"];
+      var NOUVEAU = "967811702";
+      var NORMAL = { "site.js": "normal : ce fichier contient la liste des anciens numéros pour les remplacer" };
+
+      var liste = document.getElementById("liste");
+      var resume = document.getElementById("resume");
+      var aCorriger = [];
+      var avecNouveau = 0;
+
+      function analyser(texte) {
+        var propre = texte.replace(/[\s\u00a0.\-]/g, "");
+        var extraits = [];
+        ANCIENS.forEach(function (n) {
+          var i = propre.indexOf(n);
+          while (i !== -1) {
+            extraits.push(propre.slice(Math.max(0, i - 25), i + n.length + 15));
+            i = propre.indexOf(n, i + 1);
+          }
+        });
+        return { extraits: extraits, nouveau: propre.indexOf(NOUVEAU) !== -1 };
+      }
+
+      function ajouter(classe, texte, extraits) {
+        var li = document.createElement("li");
+        var t = document.createElement("div");
+        t.className = classe;
+        t.textContent = texte;
+        li.appendChild(t);
+        (extraits || []).slice(0, 3).forEach(function (e) {
+          var p = document.createElement("div");
+          p.className = "extrait";
+          p.textContent = "… " + e + " …";
+          li.appendChild(p);
+        });
+        liste.appendChild(li);
+      }
+
+      var chaine = Promise.resolve();
+      FICHIERS.forEach(function (f) {
+        chaine = chaine.then(function () {
+          return fetch(f + "?t=" + Date.now(), { cache: "no-store" })
+            .then(function (r) { return r.ok ? r.text() : null; })
+            .catch(function () { return null; });
+        }).then(function (texte) {
+          if (texte === null) { ajouter("gris", "➖ " + f + " : fichier absent"); return; }
+          var a = analyser(texte);
+          if (a.nouveau) avecNouveau++;
+          if (!a.extraits.length) { ajouter("ok", "✅ " + f); return; }
+          if (NORMAL[f]) { ajouter("gris", "ℹ️ " + f + " : " + NORMAL[f]); return; }
+          aCorriger.push(f);
+          ajouter("ko", "❌ " + f + " : " + a.extraits.length + " fois", a.extraits);
+        });
+      });
+
+      chaine.then(function () {
+        resume.textContent = "";
+        var p = document.createElement("p");
+        if (!aCorriger.length) {
+          p.className = "ok";
+          p.textContent = "✅ Plus aucun ancien numéro dans tes fichiers. Le nouveau numéro apparaît dans " + avecNouveau + " fichier(s).";
+        } else {
+          p.className = "ko";
+          p.textContent = "❌ " + aCorriger.length + " fichier(s) à corriger : " + aCorriger.join(", ");
+        }
+        resume.appendChild(p);
+      });
+    })();
+  </script>
+</body>
+</html>
