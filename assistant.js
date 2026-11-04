@@ -1,6 +1,6 @@
 (function () {
   // ===== Réglages (tu peux les modifier) =====
-  var NUMERO_WHATSAPP = "243898560667";
+  var NUMERO_WHATSAPP = "243967811702";
   var voixActive = true;
   var NOM = "Assistant Rwagaza Tech";
 
@@ -27,7 +27,7 @@
     { mots: ["site", "creation", "creer", "web", "html", "css", "application"],
       texte: "Je crée des sites web simples, rapides et lisibles sur téléphone. Écris à Daniel sur WhatsApp pour en parler.", lien: "https://wa.me/" + NUMERO_WHATSAPP, nom: "Discuter sur WhatsApp" },
     { mots: ["prix", "tarif", "devis", "cout", "combien", "payer"],
-      texte: "Pour un prix ou un devis, le mieux est d'en parler directement avec Daniel sur WhatsApp.", lien: "https://wa.me/" + NUMERO_WHATSAPP, nom: "Demander un devis" },
+      texte: "Les tarifs de départ sont sur la page Tarifs. Pour un devis précis, parles-en directement avec Daniel sur WhatsApp.", lien: "tarifs.html", nom: "Voir les tarifs" },
     { mots: ["qui", "daniel", "propos", "fondateur", "presentation", "createur"],
       texte: "Daniel est le fondateur de Rwagaza Tech Solution. Son profil est sur la page À propos.", lien: "a-propos.html", nom: "Voir À propos" },
     { mots: ["contact", "contacter", "whatsapp", "mail", "email", "facebook", "joindre", "numero", "appeler"],
@@ -319,7 +319,8 @@
   if (entete) entete.appendChild(btn);
   appliquer(theme);
 })();
-// ===== Réglages communs du site (numéro WhatsApp, menu Tarifs, assistant IA) =====
+
+// ===== Réglages communs du site (menu Tarifs, Payer, assistant IA) =====
 (function () {
   if (document.querySelector('script[src$="site.js"]')) return;
   var s = document.createElement("script");
