@@ -1,34 +1,13 @@
-// ===== Réglages et corrections communes à tout le site =====
+// ===== Réglages communs à tout le site =====
 (function () {
   var SITE = {
     whatsapp: "243967811702",
-    anciensNumeros: ["243898560667", "243970521444"],
     email: "piterdaniel604@gmail.com",
-    urlIA: "" // adresse de ton Worker (étape IA). Laisse vide pour l'instant.
+    urlIA: "" // adresse de ton Worker (assistant IA). Laisse vide pour l'instant.
   };
   window.SITE = SITE;
 
-  // 1. Remplace les anciens numéros dans les liens WhatsApp, même ceux créés plus tard
-  function corriger(noeud) {
-    if (!noeud || noeud.nodeType !== 1) return;
-    var liens = [];
-    if (noeud.matches && noeud.matches('a[href*="wa.me/"]')) liens.push(noeud);
-    Array.prototype.forEach.call(noeud.querySelectorAll('a[href*="wa.me/"]'), function (a) { liens.push(a); });
-    liens.forEach(function (a) {
-      var h = a.getAttribute("href") || "";
-      var nouveau = h;
-      SITE.anciensNumeros.forEach(function (n) { nouveau = nouveau.split(n).join(SITE.whatsapp); });
-      if (nouveau !== h) a.setAttribute("href", nouveau);
-    });
-  }
-  corriger(document.body);
-  new MutationObserver(function (lots) {
-    lots.forEach(function (lot) {
-      Array.prototype.forEach.call(lot.addedNodes, corriger);
-    });
-  }).observe(document.body, { childList: true, subtree: true });
-
-  // 2. Menu (Tarifs, Payer) et pied de page, pages en français seulement
+  // Menu (Tarifs, Payer) et pied de page : pages en français seulement
   if (document.documentElement.lang === "fr") {
     var menu = document.querySelector("header nav");
     if (menu) {
@@ -55,7 +34,7 @@
     }
   }
 
-  // 3. Assistant IA : se charge seulement si urlIA est rempli
+  // Assistant IA : se charge seulement si urlIA est rempli
   if (SITE.urlIA) {
     var s = document.createElement("script");
     s.src = "/ia.js";
