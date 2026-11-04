@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Contrôle du numéro WhatsApp</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .ok { color:#7ee787; } .ko { color:#ff8a80; font-weight:bold; } .ni { color:var(--gris); }
+    .liste-test { list-style:none; padding:0; margin:10px 0 0; font-size:.92rem; }
+    .liste-test li { padding:5px 0; border-bottom:1px solid #1f1f22; word-break:break-all; }
+  </style>
+</head>
+<body>
+  <header><h1>Contrôle du numéro</h1></header>
+  <main>
+    <p class="sous-titre">Cette page cherche, dans les fichiers en ligne, tout numéro commençant par 243 qui n'est pas +243 967 811 702.</p>
+    <button class="bouton" id="lancer" type="button">Lancer le contrôle</button>
+    <div class="carte" id="resume">Appuie sur le bouton pour lancer le contrôle.</div>
+    <ul class="liste-test" id="liste"></ul>
+  </main>
+  <script>
+    (function () {
+      var BON = "243967811702";
+      var FICHIERS = [
+        "index.html", "projets.html", "projet.html", "apprendre.html", "galerie.html", "outils.html",
+        "tarifs.html", "paiement.html", "a-propos.html", "contact.html", "article1.html",
+        "confidentialite.html", "404.html", "offline.html", "tableau-de-bord.html",
+        "en/index.html", "es/index.html", "pt/index.html",
+        "assistant.js", "site.js", "ia.js", "publications.js", "projets-data.js", "lecons.js",
+        "galerie.js", "progres.js", "sw.js", "manifest.json"
+      ];
+      var liste = document.getElementById("liste");
+      var resume = document.getElementById("resume");
+
+      function lignesFausses(texte) {
+        var res = [];
+        texte.split("\n").forEach(function (l, i) {
+          var re = /243\d{9}/g, m, faux = false;
+          while ((m = re.exec(l)) !== null) {
+            var avant = m.index > 0 ? l.charAt(m.index - 1) : "";
+            var apres = l.charAt(m.index + m[0].length);
+            if (/\d/.test(avant) || /\d/.test(apres)) continue;
+            if (m[0] !== BON) faux = true;
+          }
+          if (faux) res.push(i + 1);
+        });
+        return res;
+      }
+
+      document.getElementById("lancer").onclick = function () {
+        liste.textContent = "";
+        resume.textContent = "Contrôle en cours...";
+        var aCorriger = 0;
+        var chaine = Promise.resolve();
+        FICHIERS.forEach(function (f) {
+          chaine = chaine.then(function () {
+            return fetch(f + "?t=" + Date.now(), { cache: "no-store" })
+              .then(function (r) { return r.ok ? r.text() : null; })
+              .catch(function () { return null; });
+          }).then(function (texte) {
+            var li = document.createElement("li");
+            if (texte === null) {
+              li.className = "ni";
+              li.textContent = "⚪ " + f + " : fichier absent (ignoré)";
+            } else {
+              var l = lignesFausses(texte);
+              if (l.length) {
+                aCorriger++;
+                li.className = "ko";
+                li.textContent = "❌ " + f + " : autre numéro aux lignes " + l.slice(0, 6).join(", ") + (l.length > 6 ? "..." : "");
+              } else {
+                li.className = "ok";
+                li.textContent = "✅ " + f;
+              }
+            }
+            liste.appendChild(li);
+          });
+        });
+        chaine.then(function () {
+          resume.textContent = aCorriger === 0
+            ? "✅ Aucun autre numéro trouvé : seul +243 967 811 702 reste."
+            : "❌ " + aCorriger + " fichier(s) à corriger : ouvre-les en édition et remplace le numéro aux lignes indiquées par 243967811702.";
+        });
+      };
+    })();
+  </script>
+</body>
+  </html>
