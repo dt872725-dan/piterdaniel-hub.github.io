@@ -18,7 +18,7 @@
     .outil summary{font-size:1.05rem;cursor:pointer}
     .outil input:not([type=checkbox]):not([type=range]):not([type=color]),.outil select,.outil textarea{box-sizing:border-box;width:100%;margin:6px 0 12px;padding:12px;border:1px solid var(--bord,#444);border-radius:10px;background:var(--fond,#101012);color:var(--texte,#fff);font:inherit}
     .outil input[type=password]:focus,.outil input:focus,.outil textarea:focus,.outil select:focus{outline:2px solid var(--or,#e0ad48);outline-offset:1px}
-    .outil input[type=color]{width:100%;height:48px;padding:0;background:transparent;border:1px solid var(--bord,#444);border-radius:10px}
+    .outil input[type=color]{width:100%;height:48px;padding:0;background:transparent;border:1px solid var(--bord,#444);border-radius:10px;cursor:pointer}
     .outil input[type=range]{width:100%}
     .outil .case{display:flex;gap:9px;align-items:flex-start;margin:8px 0}
     .outil .case input{margin-top:4px}
@@ -34,11 +34,17 @@
     .info-tech{font-size:.85rem;overflow-wrap:anywhere;white-space:pre-wrap}
     .erreur{color:#e66;font-size:.9rem;min-height:1em}
     .source{font-size:.85rem;opacity:.75}
-    .calc-ecran{padding:15px;margin:10px 0;background:#111;color:#fff;text-align:right;font-size:1.7rem;overflow-wrap:anywhere;border-radius:10px}
+    .calc-ecran{padding:15px;margin:10px 0;background:#111;color:#fff;text-align:right;font-size:1.7rem;overflow-wrap:anywhere;border-radius:10px;min-height:1.4em}
     .calc-grille{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
-    .calc-grille button{padding:14px 4px;border:1px solid var(--bord,#444);border-radius:9px;background:var(--fond,#222);color:var(--texte,#fff);font-size:1.1rem}
+    .calc-grille button{padding:14px 4px;border:1px solid var(--bord,#444);border-radius:9px;background:var(--fond,#222);color:var(--texte,#fff);font-size:1.1rem;cursor:pointer}
+    .calc-grille button:hover{border-color:var(--or,#e0ad48)}
     .notes{min-height:180px}
     .stats,.sous-titre{font-size:.9rem;opacity:.8}
+    .ligne-info{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:5px 0;border-bottom:1px dashed rgba(128,128,128,.25)}
+    .ligne-info:last-child{border-bottom:0}
+    .info-label{opacity:.8;font-size:.92rem}
+    .hash-bloc{margin:10px 0}
+    .hash-label{font-size:.78rem;letter-spacing:.08em;opacity:.7;margin-bottom:2px;text-transform:uppercase}
     :root[data-theme="clair"] .outil input:not([type=checkbox]):not([type=range]):not([type=color]),:root[data-theme="clair"] .outil select,:root[data-theme="clair"] .outil textarea{background:#fff;color:var(--texte,#222)}
     :root[data-theme="clair"] .calc-ecran{background:#eee;color:#111}
     @media(max-width:520px){.calc-grille button{padding:12px 2px}.outil{padding:12px}}
@@ -138,7 +144,7 @@
     <details class="carte outil" id="outil-couleur" data-cat="Web" data-mots="couleur hex rgb hsl css palette">
       <summary>🎨 Couleurs HEX, RGB et HSL</summary>
       <label for="col-pick">Choisis une couleur</label><input id="col-pick" type="color" value="#ffa500">
-      <label for="col-hex">Code HEX</label><input id="col-hex" value="#ffa500" autocomplete="off">
+      <label for="col-hex">Code HEX</label><input id="col-hex" value="#ffa500" autocomplete="off" spellcheck="false">
       <p class="erreur" id="col-erreur" role="alert"></p><div class="apercu-couleur" id="col-apercu"></div><div class="resultat" id="col-sortie"></div>
     </details>
 
@@ -177,108 +183,135 @@
 <script>
 (() => {
   "use strict";
+
+  /* ---------- Utilitaires ---------- */
   const $ = id => document.getElementById(id);
+  const nombre = v => { const s = String(v).trim().replace(",", "."); return s === "" ? NaN : Number(s); };
+  const fmt = n => Number.isFinite(n) ? n.toLocaleString("fr-FR", { maximumFractionDigits: 8 }) : "—";
+  const entierFr = n => Number.isFinite(n) ? Math.round(n).toLocaleString("fr-FR") : "—";
+
+  async function copie(texte) {
+    try { await navigator.clipboard.writeText(texte); return true; }
+    catch {
+      const t = document.createElement("textarea");
+      t.value = texte; t.setAttribute("readonly", "");
+      t.style.position = "fixed"; t.style.top = "-1000px";
+      document.body.appendChild(t); t.select();
+      let ok = false; try { ok = document.execCommand("copy"); } catch {}
+      t.remove(); return ok;
+    }
+  }
+
+  function ligne(valeur, label = "Copier") {
+    const row = document.createElement("div"); row.className = "ligne-copie";
+    const code = document.createElement("code"); code.textContent = valeur;
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "mini-btn"; btn.textContent = label;
+    btn.addEventListener("click", async () => {
+      btn.textContent = (await copie(valeur)) ? "Copié !" : "Échec";
+      setTimeout(() => { btn.textContent = label; }, 1400);
+    });
+    row.append(code, btn); return row;
+  }
+
+  function info(label, valeur) {
+    const d = document.createElement("div"); d.className = "ligne-info";
+    const s = document.createElement("span"); s.className = "info-label"; s.textContent = label;
+    const v = document.createElement("b"); v.textContent = valeur;
+    d.append(s, v); return d;
+  }
+
+  function debounce(fn, ms) {
+    let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+  }
+
+  /* ---------- Recherche et filtres ---------- */
   const outils = [...document.querySelectorAll(".outil")];
   const cats = ["Tous", ...new Set(outils.map(o => o.dataset.cat))];
   let categorie = "Tous";
   const filtres = $("filtres-outils");
+
   cats.forEach(cat => {
-    const b = document.createElement("button"); b.type = "button"; b.textContent = cat;
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = cat;
     b.className = "mini-btn"; b.setAttribute("aria-pressed", String(cat === categorie));
     b.addEventListener("click", () => { categorie = cat; filtrer(); });
     filtres.appendChild(b);
   });
+
   function filtrer() {
     const q = $("rech-outil").value.trim().toLocaleLowerCase("fr");
     let n = 0;
     outils.forEach(o => {
-      const match = (categorie === "Tous" || o.dataset.cat === categorie) &&
-        (o.textContent + " " + o.dataset.mots).toLocaleLowerCase("fr").includes(q);
-      o.hidden = !match; if (match) n++;
+      const texte = (o.textContent + " " + o.dataset.mots).toLocaleLowerCase("fr");
+      const ok = (categorie === "Tous" || o.dataset.cat === categorie) && texte.includes(q);
+      o.hidden = !ok; if (ok) n++;
     });
     [...filtres.children].forEach(b => b.setAttribute("aria-pressed", String(b.textContent === categorie)));
     $("compteur-outils").textContent = `${n} outil${n > 1 ? "s" : ""} affiché${n > 1 ? "s" : ""} sur ${outils.length}.`;
   }
-  $("rech-outil").addEventListener("input", filtrer); filtrer();
+  $("rech-outil").addEventListener("input", filtrer);
+  filtrer();
   $("annee").textContent = new Date().getFullYear();
 
-  const copie = async texte => {
-    try { await navigator.clipboard.writeText(texte); return true; }
-    catch {
-      const t = document.createElement("textarea"); t.value = texte; document.body.appendChild(t); t.select();
-      let ok = false; try { ok = document.execCommand("copy"); } catch {}
-      t.remove(); return ok;
-    }
-  };
-  function ligne(valeur, label="Copier") {
-    const row = document.createElement("div"); row.className = "ligne-copie";
-    const code = document.createElement("code"); code.textContent = valeur;
-    const btn = document.createElement("button"); btn.type = "button"; btn.className = "mini-btn"; btn.textContent = label;
-    btn.addEventListener("click", async () => { btn.textContent = await copie(valeur) ? "Copié !" : "Échec"; setTimeout(() => btn.textContent = label, 1400); });
-    row.append(code, btn); return row;
-  }
-  const nombre = v => Number(String(v).trim().replace(",", "."));
-  const fmt = n => Number.isFinite(n) ? n.toLocaleString("fr-FR", {maximumFractionDigits:8}) : "—";
-
-  // Générateur de mot de passe
+  /* =========================================================
+     1. Générateur de mot de passe
+     ========================================================= */
   const mdpLong = $("mdp-long");
-  mdpLong.addEventListener("input", () => $("mdp-long-val").textContent = mdpLong.value);
+  mdpLong.addEventListener("input", () => { $("mdp-long-val").textContent = mdpLong.value; });
+
   $("mdp-mode").addEventListener("change", () => {
-    const pin = $("mdp-mode").value === "pin"; $("mdp-options").hidden = pin;
-    mdpLong.min = pin ? 4 : 8; if (+mdpLong.value < +mdpLong.min) mdpLong.value = mdpLong.min;
+    const pin = $("mdp-mode").value === "pin";
+    $("mdp-options").hidden = pin;
+    mdpLong.min = pin ? 4 : 8;
+    if (+mdpLong.value < +mdpLong.min) mdpLong.value = mdpLong.min;
     $("mdp-long-val").textContent = mdpLong.value;
+    genererMdp();
   });
+
   function randomIndex(max) {
-    const a = new Uint32Array(1); const limite = Math.floor(0x100000000 / max) * max;
+    const a = new Uint32Array(1);
+    const limite = Math.floor(0x100000000 / max) * max;
     do { crypto.getRandomValues(a); } while (a[0] >= limite);
     return a[0] % max;
   }
+
   function genererMdp() {
-    const pin = $("mdp-mode").value === "pin", len = +mdpLong.value;
+    const pin = $("mdp-mode").value === "pin";
+    const len = +mdpLong.value;
+    const sym = "!@#$%^&*()-_=+[]{};:,.?";
+    const amb = $("mdp-amb").checked;
+
     let groupes = pin ? ["0123456789"] : [
-      $("mdp-maj").checked ? "ABCDEFGHJKLMNPQRSTUVWXYZ" : "",
-      $("mdp-min").checked ? "abcdefghijkmnopqrstuvwxyz" : "",
-      $("mdp-chi").checked ? "23456789" : "",
-      $("mdp-sym").checked ? "!@#$%^&*()-_=+[]{};:,.?" : ""
+      $("mdp-maj").checked ? (amb ? "ABCDEFGHJKLMNPQRSTUVWXYZ" : "ABCDEFGHIJKLMNOPQRSTUVWXYZ") : "",
+      $("mdp-min").checked ? (amb ? "abcdefghijkmnopqrstuvwxyz" : "abcdefghijklmnopqrstuvwxyz") : "",
+      $("mdp-chi").checked ? (amb ? "23456789" : "0123456789") : "",
+      $("mdp-sym").checked ? sym : ""
     ].filter(Boolean);
-    if (!pin && !$("mdp-amb").checked) groupes = [
-      $("mdp-maj").checked ? "ABCDEFGHIJKLMNOPQRSTUVWXYZ" : "",
-      $("mdp-min").checked ? "abcdefghijklmnopqrstuvwxyz" : "",
-      $("mdp-chi").checked ? "0123456789" : "",
-      $("mdp-sym").checked ? "!@#$%^&*()-_=+[]{};:,.?" : ""
-    ].filter(Boolean);
-    if (!groupes.length) { $("mdp-erreur").textContent = "Choisis au moins un type de caractère."; return; }
-    if (!crypto || !crypto.getRandomValues) { $("mdp-erreur").textContent = "Ton navigateur ne prend pas en charge le générateur sécurisé."; return; }
-    $("mdp-erreur").textContent = ""; const alphabet = [...new Set(groupes.join(""))];
+
+    if (!groupes.length) {
+      $("mdp-erreur").textContent = "Choisis au moins un type de caractère.";
+      $("mdp-sortie").replaceChildren(); $("mdp-force").textContent = "";
+      $("mdp-barre").style.width = "0%";
+      return;
+    }
+    if (!window.crypto || !crypto.getRandomValues) {
+      $("mdp-erreur").textContent = "Ton navigateur ne prend pas en charge le générateur sécurisé.";
+      return;
+    }
+
+    $("mdp-erreur").textContent = "";
+    const alphabet = [...new Set(groupes.join(""))];
     const resultat = [];
-    for (let k=0; k<+$("mdp-nb").value; k++) {
+
+    for (let k = 0; k < +$("mdp-nb").value; k++) {
       const chars = groupes.map(g => g[randomIndex(g.length)]);
       while (chars.length < len) chars.push(alphabet[randomIndex(alphabet.length)]);
-      for (let i=chars.length-1;i>0;i--) { const j=randomIndex(i+1); [chars[i],chars[j]]=[chars[j],chars[i]]; }
-      resultat.push(chars.slice(0,len).join(""));
+      for (let i = chars.length - 1; i > 0; i--) {
+        const j = randomIndex(i + 1);
+        [chars[i], chars[j]] = [chars[j], chars[i]];
+      }
+      resultat.push(chars.slice(0, len).join(""));
     }
-    $("mdp-sortie").replaceChildren(...resultat.map(v => ligne(v)));
-    const bits = len * Math.log2(alphabet.length); const score = Math.min(100, bits/1.28);
-    $("mdp-barre").style.width = score+"%"; $("mdp-barre").style.background = score<35?"#d44":score<65?"#e6a23c":"#2aaf70";
-    $("mdp-force").textContent = `Entropie théorique approximative : ${Math.round(bits)} bits.`;
-  }
-  $("mdp-generer").addEventListener("click", genererMdp); genererMdp();
 
-  // Testeur indicatif
-  $("test-voir").addEventListener("change", e => $("test-mdp").type = e.target.checked ? "text" : "password");
-  $("test-mdp").addEventListener("input", () => {
-    const p = $("test-mdp").value, checks = [
-      [p.length>=12,"Au moins 12 caractères"],[p.length>=16,"Idéalement 16 caractères ou plus"],
-      [/[a-z]/.test(p),"Une minuscule"],[/[A-Z]/.test(p),"Une majuscule"],
-      [/\d/.test(p),"Un chiffre"],[/[^A-Za-z0-9]/.test(p),"Un symbole"],
-      [!/(.)\1{2,}/.test(p),"Éviter les répétitions"]
-    ];
-    let score = checks.filter(x=>x[0]).length; if (/(password|azerty|qwerty|123456|admin)/i.test(p)) score=0;
-    const pct = p ? score/checks.length*100 : 0;
-    $("test-barre").style.width=pct+"%"; $("test-barre").style.background=pct<40?"#d44":pct<75?"#e6a23c":"#2aaf70";
-    $("test-niveau").textContent = !p ? "Saisis un exemple pour voir l'estimation." : score<3?"Faible":score<5?"Moyen":score<7?"Bon":"Très bon";
-    $("test-conseils").replaceChildren(...checks.map(([ok,t])=>{const li=document.createElement("li");li.textContent=(ok?"✓ ":"○ ")+t;return li;}));
-  });
-
-  // Hash SHA via Web Crypto
-  a
+    $("mdp-sortie").replaceChildren(...resultat.map(v 
