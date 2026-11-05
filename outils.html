@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0c0c0d">
-  <title>Outils gratuits | Rwagaza Tech Solution</title>
-  <meta name="description" content="13 outils gratuits : mots de passe, hash SHA, Base64, JSON, couleurs, réseau IPv4, bases numériques, calculatrice, pourcentages et texte.">
+  <title>Outils gratuits : mot de passe, hash, JSON, calculatrices | Rwagaza Tech Solution</title>
+  <meta name="description" content="13 outils gratuits : générateur et testeur de mot de passe, empreintes SHA, Base64, JSON, couleurs, bases numériques, calculatrice réseau, octets, pourcentages, bloc-notes et convertisseur de texte.">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="stylesheet" href="style.css">
@@ -13,272 +13,362 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Rwagaza Tech">
   <style>
-    [hidden]{display:none!important}
-    .outil:hover{transform:none}
-    .outil summary{font-size:1.05rem;cursor:pointer}
-    .outil input:not([type=checkbox]):not([type=range]):not([type=color]),.outil select,.outil textarea{box-sizing:border-box;width:100%;margin:6px 0 12px;padding:12px;border:1px solid var(--bord,#444);border-radius:10px;background:var(--fond,#101012);color:var(--texte,#fff);font:inherit}
-    .outil input[type=password]:focus,.outil input:focus,.outil textarea:focus,.outil select:focus{outline:2px solid var(--or,#e0ad48);outline-offset:1px}
-    .outil input[type=color]{width:100%;height:48px;padding:0;background:transparent;border:1px solid var(--bord,#444);border-radius:10px}
-    .outil input[type=range]{width:100%}
-    .outil .case{display:flex;gap:9px;align-items:flex-start;margin:8px 0}
-    .outil .case input{margin-top:4px}
-    .barre-force{background:#333;border-radius:8px;height:10px;overflow:hidden;margin:10px 0 6px}
-    .barre-force div{height:100%;width:0;transition:width .3s,background .3s}
-    .resultat{margin:12px 0;padding:10px;border-radius:10px;background:rgba(128,128,128,.09);overflow-wrap:anywhere}
-    .ligne-copie{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 0}
-    .ligne-copie code{flex:1 1 180px;word-break:break-all;color:var(--texte,#fff);user-select:text}
-    .mini-btn,.outils-rangee button{background:transparent;color:var(--or,#e0ad48);border:1px solid var(--or,#e0ad48);border-radius:16px;padding:6px 12px;cursor:pointer}
-    .mini-btn:hover,.outils-rangee button:hover{background:var(--or,#e0ad48);color:#111}
-    .outils-rangee{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-    .apercu-couleur{height:60px;border-radius:10px;border:1px solid var(--bord,#444);margin:10px 0}
-    .info-tech{font-size:.85rem;overflow-wrap:anywhere;white-space:pre-wrap}
-    .erreur{color:#e66;font-size:.9rem;min-height:1em}
-    .source{font-size:.85rem;opacity:.75}
-    .calc-ecran{padding:15px;margin:10px 0;background:#111;color:#fff;text-align:right;font-size:1.7rem;overflow-wrap:anywhere;border-radius:10px}
-    .calc-grille{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
-    .calc-grille button{padding:14px 4px;border:1px solid var(--bord,#444);border-radius:9px;background:var(--fond,#222);color:var(--texte,#fff);font-size:1.1rem}
-    .notes{min-height:180px}
-    .stats,.sous-titre{font-size:.9rem;opacity:.8}
-    :root[data-theme="clair"] .outil input:not([type=checkbox]):not([type=range]):not([type=color]),:root[data-theme="clair"] .outil select,:root[data-theme="clair"] .outil textarea{background:#fff;color:var(--texte,#222)}
-    :root[data-theme="clair"] .calc-ecran{background:#eee;color:#111}
-    @media(max-width:520px){.calc-grille button{padding:12px 2px}.outil{padding:12px}}
+    [hidden] { display:none !important; }
+    .outil:hover { transform:none; }
+    .outil summary { font-size:1.05rem; }
+    .outil input[type="password"] { width:100%; background:#0c0c0d; color:#fff; border:1px solid var(--bord); border-radius:10px; padding:12px; font-size:1rem; font-family:inherit; }
+    .outil input[type="password"]:focus { outline:2px solid var(--or); }
+    .outil input[type="color"] { width:100%; height:48px; padding:0; background:transparent; border:1px solid var(--bord); border-radius:10px; }
+    :root[data-theme="clair"] .outil input[type="password"] { background:#fff; color:var(--texte); }
+    .barre-force { background:#2b2b2e; border-radius:8px; height:10px; overflow:hidden; margin:10px 0 6px; }
+    .barre-force div { height:100%; width:0; transition:width .3s, background .3s; }
+    .outil .resultat .ligne-copie { flex-wrap:wrap; align-items:center; }
+    .outil .resultat .ligne-copie code { flex:1 1 200px; word-break:break-all; font-family:monospace; color:var(--texte); user-select:text; -webkit-user-select:text; text-align:left; }
+    .mini-btn { background:transparent; color:var(--or); border:1px solid var(--or); border-radius:16px; padding:2px 12px; cursor:pointer; font-size:.8rem; flex-shrink:0; }
+    .mini-btn:hover { background:var(--or); color:#111; }
+    .apercu-couleur { height:60px; border-radius:10px; border:1px solid var(--bord); margin:10px 0; }
+    .info-tech { font-size:.85rem; color:var(--gris); word-break:break-word; white-space:pre-wrap; }
   </style>
 </head>
 <body>
-<header>
-  <h1>Rwagaza Tech Solution</h1>
-  <nav aria-label="Menu principal">
-    <a href="index.html">Accueil</a><a href="projets.html">Projets</a><a href="apprendre.html">Apprendre</a>
-    <a href="galerie.html">Galerie</a><a href="outils.html" aria-current="page">Outils</a>
-    <a href="tarifs.html">Tarifs</a><a href="a-propos.html">À propos</a><a href="contact.html">Contact</a>
-  </nav>
-</header>
+  <header>
+    <h1>Rwagaza Tech Solution</h1>
+    <nav aria-label="Menu principal">
+      <a href="index.html">Accueil</a>
+      <a href="projets.html">Projets</a>
+      <a href="apprendre.html">Apprendre</a>
+      <a href="galerie.html">Galerie</a>
+      <a href="outils.html" aria-current="page">Outils</a>
+      <a href="tarifs.html">Tarifs</a>
+      <a href="a-propos.html">À propos</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
 
-<main>
-  <h2>Outils gratuits</h2>
-  <p class="sous-titre">13 outils pour l'informatique et le quotidien. Les calculs sont effectués dans ton navigateur. Les données saisies ne sont pas envoyées à un serveur par cette page.</p>
-  <input id="rech-outil" class="recherche" type="search" placeholder="Rechercher un outil : mot de passe, JSON, hash..." aria-label="Rechercher un outil">
-  <div id="filtres-outils" class="filtres"></div>
-  <p id="compteur-outils" class="sous-titre" aria-live="polite"></p>
+  <main>
+    <h2>Outils gratuits</h2>
+    <p class="sous-titre">13 outils pour l'informatique et le quotidien. Tout se calcule sur ton téléphone : rien n'est envoyé nulle part, aucun mot de passe n'est enregistré. Appuie sur un outil pour l'ouvrir.</p>
 
-  <div id="outils-liste">
-    <details class="carte outil" id="outil-mdp" data-cat="Sécurité" data-mots="mot de passe password generateur pin code aleatoire" open>
-      <summary>🔐 Générateur de mot de passe</summary>
-      <label for="mdp-mode">Type</label><select id="mdp-mode"><option value="mdp">Mot de passe</option><option value="pin">Code PIN</option></select>
-      <label for="mdp-long">Longueur : <b id="mdp-long-val">16</b></label><input id="mdp-long" type="range" min="4" max="64" value="16">
-      <div id="mdp-options">
-        <label class="case"><input type="checkbox" id="mdp-maj" checked> Majuscules</label>
-        <label class="case"><input type="checkbox" id="mdp-min" checked> Minuscules</label>
-        <label class="case"><input type="checkbox" id="mdp-chi" checked> Chiffres</label>
-        <label class="case"><input type="checkbox" id="mdp-sym" checked> Symboles</label>
-        <label class="case"><input type="checkbox" id="mdp-amb" checked> Éviter les caractères similaires (I, l, 1, O, 0)</label>
-      </div>
-      <label for="mdp-nb">Nombre à générer</label><select id="mdp-nb"><option>1</option><option>5</option><option>10</option></select>
-      <div class="resultat" id="mdp-sortie"></div><div class="barre-force"><div id="mdp-barre"></div></div>
-      <p class="sous-titre" id="mdp-force"></p><p class="erreur" id="mdp-erreur" role="alert"></p>
-      <button class="bouton" id="mdp-generer" type="button">Générer</button>
-      <p class="source">Utilise un mot de passe différent pour chaque compte. Garde-le dans un gestionnaire de mots de passe fiable.</p>
+    <input id="rech-outil" class="recherche" type="search" placeholder="Rechercher un outil : mot de passe, JSON, hash...">
+    <div id="filtres-outils" class="filtres"></div>
+    <p id="compteur-outils" class="sous-titre"></p>
+
+    <div id="outils-liste">
+
+      <details class="carte outil" id="outil-mdp" data-cat="Sécurité" data-mots="mot de passe password generateur pin code aleatoire" open>
+        <summary>🔐 Générateur de mot de passe</summary>
+        <label for="mdp-mode">Type</label>
+        <select id="mdp-mode">
+          <option value="mdp">Mot de passe</option>
+          <option value="pin">Code PIN (chiffres seulement)</option>
+        </select>
+        <label for="mdp-long">Longueur : <b id="mdp-long-val">16</b> caractères</label>
+        <input id="mdp-long" type="range" min="8" max="64" value="16">
+        <div id="mdp-options">
+          <label class="case"><input type="checkbox" id="mdp-maj" checked> Majuscules</label>
+          <label class="case"><input type="checkbox" id="mdp-min" checked> Minuscules</label>
+          <label class="case"><input type="checkbox" id="mdp-chi" checked> Chiffres</label>
+          <label class="case"><input type="checkbox" id="mdp-sym" checked> Symboles</label>
+          <label class="case"><input type="checkbox" id="mdp-amb" checked> Éviter les caractères qui se ressemblent (I, l, 1, O, 0)</label>
+        </div>
+        <label for="mdp-nb">Combien en générer</label>
+        <select id="mdp-nb">
+          <option value="1">1</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+        </select>
+        <div class="resultat" id="mdp-sortie"></div>
+        <div class="barre-force"><div id="mdp-barre"></div></div>
+        <p class="sous-titre" id="mdp-force"></p>
+        <p class="erreur" id="mdp-erreur" role="alert"></p>
+        <p class="source" id="mdp-securite"></p>
+        <button class="bouton" id="mdp-generer" type="button">Générer</button>
+      </details>
+
+      <details class="carte outil" id="outil-test" data-cat="Sécurité" data-mots="tester verifier force solidite mot de passe">
+        <summary>🛡️ Testeur de mot de passe</summary>
+        <label for="test-mdp">Écris un mot de passe à tester</label>
+        <input id="test-mdp" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Ton mot de passe">
+        <label class="case"><input type="checkbox" id="test-voir"> Afficher</label>
+        <div class="barre-force"><div id="test-barre"></div></div>
+        <p class="sous-titre" id="test-niveau"></p>
+        <ul class="puces" id="test-conseils"></ul>
+        <p class="source">Ce test se fait sur ton téléphone : le mot de passe n'est ni envoyé ni enregistré. N'y écris pas un mot de passe que tu utilises vraiment : teste plutôt un exemple du même genre. L'estimation est indicative.</p>
+      </details>
+
+      <details class="carte outil" id="outil-hash" data-cat="Sécurité" data-mots="hash empreinte sha256 sha512 sha1 chiffrement">
+        <summary>#️⃣ Empreintes SHA (hash)</summary>
+        <label for="hash-texte">Texte</label>
+        <textarea id="hash-texte" class="conv-texte" placeholder="Écris ou colle un texte..."></textarea>
+        <p class="erreur" id="hash-erreur" role="alert"></p>
+        <div class="resultat" id="hash-sortie"></div>
+        <p class="source">Une empreinte identifie un texte sans le révéler : le moindre changement donne une empreinte totalement différente. Ce n'est pas du chiffrement. SHA-1 est vieilli : préfère SHA-256 ou SHA-512. Dans une vraie application, on ne stocke pas les mots de passe avec un simple SHA.</p>
+      </details>
+
+      <details class="carte outil" id="outil-conv" data-cat="Réseau" data-mots="octets ko mo go to convertisseur taille stockage">
+        <summary>💾 Convertisseur d'octets</summary>
+        <label for="conv-valeur">Valeur</label>
+        <input id="conv-valeur" type="text" inputmode="decimal" value="1">
+        <label for="conv-unite">Unité de départ</label>
+        <select id="conv-unite"></select>
+        <label for="conv-base">Système</label>
+        <select id="conv-base">
+          <option value="1000">Décimal (1 Ko = 1 000 octets)</option>
+          <option value="1024">Binaire (1 Kio = 1 024 octets)</option>
+        </select>
+        <div class="resultat" id="conv-sortie"></div>
+        <p class="source">Les fabricants de stockage utilisent le système décimal ; les systèmes d'exploitation affichent souvent le binaire, d'où les petites différences de capacité.</p>
+      </details>
+
+      <details class="carte outil" id="outil-cidr" data-cat="Réseau" data-mots="reseau ip cidr masque sous-reseau ipv4 adresse">
+        <summary>🌐 Calculatrice réseau (IPv4)</summary>
+        <label for="cidr-entree">Adresse IP et préfixe</label>
+        <input id="cidr-entree" type="text" inputmode="text" value="192.168.1.10/24" placeholder="192.168.1.10/24" autocomplete="off">
+        <p class="erreur" id="cidr-erreur" role="alert"></p>
+        <button class="bouton" id="cidr-calculer" type="button">Calculer</button>
+        <div class="resultat" id="cidr-sortie"></div>
+        <p class="source">Le préfixe (par exemple /24) indique combien de bits appartiennent au réseau. Plus il est grand, plus le réseau est petit.</p>
+      </details>
+
+      <details class="carte outil" id="outil-bases" data-cat="Programmation" data-mots="binaire decimal hexadecimal octal base convertisseur nombre">
+        <summary>🔢 Binaire, décimal, hexadécimal</summary>
+        <label for="base-val">Nombre</label>
+        <input id="base-val" type="text" inputmode="text" value="255" autocomplete="off" autocapitalize="off">
+        <label for="base-de">Système de départ</label>
+        <select id="base-de">
+          <option value="10">Décimal (base 10)</option>
+          <option value="2">Binaire (base 2)</option>
+          <option value="8">Octal (base 8)</option>
+          <option value="16">Hexadécimal (base 16)</option>
+        </select>
+        <p class="erreur" id="base-erreur" role="alert"></p>
+        <div class="resultat" id="base-sortie"></div>
+      </details>
+
+      <details class="carte outil" id="outil-b64" data-cat="Programmation" data-mots="base64 url encoder decoder encodage">
+        <summary>🔁 Base64 et URL</summary>
+        <label for="b64-entree">Texte</label>
+        <textarea id="b64-entree" class="conv-texte" placeholder="Écris ou colle un texte..."></textarea>
+        <div class="outils-rangee" id="b64-boutons"></div>
+        <p class="erreur" id="b64-erreur" role="alert"></p>
+        <label for="b64-sortie">Résultat</label>
+        <textarea id="b64-sortie" class="conv-texte" readonly></textarea>
+        <div class="outils-rangee"><button id="b64-copier" type="button">Copier le résultat</button></div>
+        <p class="source">Le Base64 n'est pas du chiffrement : n'importe qui peut le décoder. Il sert à transporter des données sous forme de texte.</p>
+      </details>
+
+      <details class="carte outil" id="outil-json" data-cat="Programmation" data-mots="json formater verifier minifier validateur">
+        <summary>🧾 Formateur JSON</summary>
+        <label for="json-entree">JSON</label>
+        <textarea id="json-entree" class="conv-texte" placeholder='{"nom":"Daniel","outils":["HTML","CSS"]}'></textarea>
+        <div class="outils-rangee" id="json-boutons"></div>
+        <p class="sous-titre" id="json-msg" role="alert"></p>
+        <label for="json-sortie">Résultat</label>
+        <textarea id="json-sortie" class="conv-texte" readonly></textarea>
+        <div class="outils-rangee"><button id="json-copier" type="button">Copier le résultat</button></div>
+      </details>
+
+      <details class="carte outil" id="outil-couleur" data-cat="Web" data-mots="couleur hex rgb hsl css palette contraste">
+        <summary>🎨 Couleurs (HEX, RGB, HSL)</summary>
+        <label for="col-pick">Choisis une couleur</label>
+        <input id="col-pick" type="color" value="#ffa500">
+        <label for="col-hex">Ou écris-la (HEX)</label>
+        <input id="col-hex" type="text" value="#ffa500" autocomplete="off" autocapitalize="off">
+        <p class="erreur" id="col-erreur" role="alert"></p>
+        <div class="apercu-couleur" id="col-apercu"></div>
+        <div class="resultat" id="col-sortie"></div>
+      </details>
+
+      <details class="carte outil" id="outil-calc" data-cat="Calcul" data-mots="calculatrice calcul addition multiplication">
+        <summary>🧮 Calculatrice</summary>
+        <div class="calc-sous" id="calc-sous"></div>
+        <div class="calc-ecran" id="calc-ecran" aria-live="polite">0</div>
+        <div class="calc-grille" id="calc-grille"></div>
+        <p class="source">Elle respecte les priorités (la multiplication et la division passent avant l'addition et la soustraction) et accepte les parenthèses.</p>
+      </details>
+
+      <details class="carte outil" id="outil-pct" data-cat="Calcul" data-mots="pourcentage remise prix benefice hausse variation">
+        <summary>％ Pourcentages et remises</summary>
+        <label for="pct-a">Nombre A</label>
+        <input id="pct-a" type="text" inputmode="decimal" value="20">
+        <label for="pct-b">Nombre B</label>
+        <input id="pct-b" type="text" inputmode="decimal" value="150">
+        <div class="resultat" id="pct-sortie"></div>
+        <p class="source">Exemple : avec A = 20 et B = 150, tu obtiens 20 % de 150, 150 augmenté ou diminué de 20 %, et la variation de 20 vers 150. Pratique pour une remise ou un bénéfice.</p>
+      </details>
+
+      <details class="carte outil" id="outil-notes" data-cat="Texte" data-mots="bloc-notes notes memo ecrire">
+        <summary>📝 Bloc-notes</summary>
+        <textarea id="notes" class="notes" placeholder="Écris tes notes ici. Elles restent sur cet appareil."></textarea>
+        <p class="stats" id="notes-stats"></p>
+        <div class="outils-rangee">
+          <button id="notes-copier" type="button">Copier</button>
+          <button id="notes-telecharger" type="button">Télécharger (.txt)</button>
+          <button id="notes-effacer" type="button">Effacer</button>
+        </div>
+        <p class="source">Tes notes sont enregistrées automatiquement dans ce navigateur, jamais sur un serveur. Si tu effaces les données du navigateur, elles disparaissent : télécharge les notes importantes.</p>
+      </details>
+
+      <details class="carte outil" id="outil-texte" data-cat="Texte" data-mots="texte majuscules minuscules accents slug trier convertisseur">
+        <summary>🔤 Convertisseur de texte</summary>
+        <label for="txt-entree">Ton texte</label>
+        <textarea id="txt-entree" class="conv-texte" placeholder="Colle ou écris ton texte..."></textarea>
+        <p class="stats" id="txt-stats"></p>
+        <div class="outils-rangee" id="txt-boutons"></div>
+        <label for="txt-sortie">Résultat</label>
+        <textarea id="txt-sortie" class="conv-texte" readonly></textarea>
+        <div class="outils-rangee">
+          <button id="txt-copier" type="button">Copier le résultat</button>
+          <button id="txt-reprendre" type="button">Réutiliser le résultat</button>
+        </div>
+      </details>
+
+    </div>
+
+    <details class="carte" id="infos">
+      <summary>Informations techniques</summary>
+      <p class="info-tech" id="infos-texte"></p>
     </details>
+  </main>
 
-    <details class="carte outil" id="outil-test" data-cat="Sécurité" data-mots="tester verifier force solidite mot de passe">
-      <summary>🛡️ Testeur de mot de passe</summary>
-      <label for="test-mdp">Mot de passe à tester</label><input id="test-mdp" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Exemple de mot de passe">
-      <label class="case"><input type="checkbox" id="test-voir"> Afficher</label>
-      <div class="barre-force"><div id="test-barre"></div></div><p id="test-niveau" class="sous-titre" aria-live="polite"></p><ul class="puces" id="test-conseils"></ul>
-      <p class="source">Ne saisis pas un mot de passe que tu utilises réellement. L'estimation est indicative et ne remplace pas un audit de sécurité.</p>
-    </details>
+  <a class="wa-flottant" href="https://wa.me/243967811702" target="_blank" rel="noopener" aria-label="Me contacter sur WhatsApp">💬 WhatsApp</a>
 
-    <details class="carte outil" id="outil-hash" data-cat="Sécurité" data-mots="hash empreinte sha256 sha512 sha1 chiffrement">
-      <summary>#️⃣ Empreintes SHA (hash)</summary>
-      <label for="hash-texte">Texte</label><textarea id="hash-texte" class="conv-texte" placeholder="Écris ou colle un texte..."></textarea>
-      <div class="resultat" id="hash-sortie"></div>
-      <p class="source">Une empreinte n'est pas du chiffrement. SHA-1 est obsolète pour les usages de sécurité. Ne stocke jamais des mots de passe avec un simple SHA : utilise Argon2id, scrypt ou bcrypt côté serveur.</p>
-    </details>
+  <footer>
+    <p class="langues">
+      <a href="/" aria-current="true">Français</a>
+      <a href="/en/">English</a>
+      <a href="/es/">Español</a>
+      <a href="/pt/">Português</a>
+    </p>
+    <p>
+      <a href="index.html">Accueil</a>
+      <a href="projets.html">Projets</a>
+      <a href="apprendre.html">Apprendre</a>
+      <a href="galerie.html">Galerie</a>
+      <a href="outils.html">Outils</a>
+      <a href="tarifs.html">Tarifs</a>
+      <a href="a-propos.html">À propos</a>
+      <a href="contact.html">Contact</a>
+    </p>
+    <p><a href="confidentialite.html">Mentions légales et confidentialité</a></p>
+    <p>© 2026 Rwagaza Tech Solution</p>
+  </footer>
 
-    <details class="carte outil" id="outil-conv" data-cat="Réseau" data-mots="octets ko mo go to convertisseur taille stockage">
-      <summary>💾 Convertisseur d'octets</summary>
-      <label for="conv-valeur">Valeur</label><input id="conv-valeur" inputmode="decimal" value="1">
-      <label for="conv-unite">Unité de départ</label><select id="conv-unite"></select>
-      <label for="conv-base">Système</label><select id="conv-base"><option value="1000">Décimal (Ko = 1 000 octets)</option><option value="1024">Binaire (Kio = 1 024 octets)</option></select>
-      <div class="resultat" id="conv-sortie"></div>
-      <p class="source">Les fabricants utilisent généralement le décimal ; les systèmes peuvent afficher des unités binaires.</p>
-    </details>
+  <script>
+    (function () {
+      var VERSION_PAGE = "outils v15";
+      var erreursPage = [];
+      function $(id) { return document.getElementById(id); }
 
-    <details class="carte outil" id="outil-cidr" data-cat="Réseau" data-mots="reseau ip cidr masque sous-reseau ipv4 adresse">
-      <summary>🌐 Calculatrice réseau IPv4</summary>
-      <label for="cidr-entree">Adresse IP et préfixe</label><input id="cidr-entree" value="192.168.1.10/24" autocomplete="off">
-      <p class="erreur" id="cidr-erreur" role="alert"></p><button class="bouton" id="cidr-calculer" type="button">Calculer</button><div class="resultat" id="cidr-sortie"></div>
-      <p class="source">Le préfixe /24 signifie que 24 bits identifient le réseau.</p>
-    </details>
+      /* ===== Aides communes ===== */
+      function el(tag, cls, txt) {
+        var e = document.createElement(tag);
+        if (cls) e.className = cls;
+        if (txt) e.textContent = txt;
+        return e;
+      }
+      function normaliser(t) {
+        return String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      }
+      function statsTexte(t) {
+        var mots = t.trim() ? t.trim().split(/\s+/).length : 0;
+        var lignes = t ? t.split("\n").length : 0;
+        return mots + " mots · " + t.length + " caractères · " + lignes + " lignes";
+      }
+      function nombre(s) {
+        var v = parseFloat(String(s).replace(/\s/g, "").replace(",", "."));
+        return isNaN(v) ? null : v;
+      }
+      function fmt(x) {
+        return x.toLocaleString("fr-FR", { maximumFractionDigits: 4 });
+      }
+      function niveauForce(bits) {
+        if (bits < 40) return { texte: "faible", couleur: "#d93025" };
+        if (bits < 60) return { texte: "moyenne", couleur: "#ff8a00" };
+        if (bits < 80) return { texte: "forte", couleur: "#9acd32" };
+        return { texte: "très forte", couleur: "#2ea043" };
+      }
 
-    <details class="carte outil" id="outil-bases" data-cat="Programmation" data-mots="binaire decimal hexadecimal octal base convertisseur nombre">
-      <summary>🔢 Binaire, décimal, octal et hexadécimal</summary>
-      <label for="base-val">Nombre</label><input id="base-val" value="255" autocomplete="off">
-      <label for="base-de">Système de départ</label><select id="base-de"><option value="10">Décimal</option><option value="2">Binaire</option><option value="8">Octal</option><option value="16">Hexadécimal</option></select>
-      <p class="erreur" id="base-erreur" role="alert"></p><div class="resultat" id="base-sortie"></div>
-    </details>
+      // Copie dans le presse-papiers, avec une solution de secours
+      function copier(texte, btn, libelle) {
+        if (!texte) return;
+        function fini(ok) {
+          btn.textContent = ok ? "Copié ✓" : "Copie impossible : sélectionne le texte";
+          setTimeout(function () { btn.textContent = libelle; }, 2000);
+        }
+        function secours() {
+          var ta = document.createElement("textarea");
+          ta.value = texte;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          try { ta.setSelectionRange(0, texte.length); } catch (e) {}
+          var ok = false;
+          try { ok = document.execCommand("copy"); } catch (e) {}
+          document.body.removeChild(ta);
+          fini(ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(texte).then(function () { fini(true); }).catch(secours);
+        } else {
+          secours();
+        }
+      }
 
-    <details class="carte outil" id="outil-b64" data-cat="Programmation" data-mots="base64 url encoder decoder encodage">
-      <summary>🔁 Base64 et URL</summary>
-      <label for="b64-entree">Texte</label><textarea id="b64-entree" class="conv-texte" placeholder="Écris ou colle un texte..."></textarea>
-      <div class="outils-rangee" id="b64-boutons"></div><p class="erreur" id="b64-erreur" role="alert"></p>
-      <label for="b64-sortie">Résultat</label><textarea id="b64-sortie" class="conv-texte" readonly></textarea>
-      <div class="outils-rangee"><button id="b64-copier" type="button">Copier le résultat</button></div>
-      <p class="source">Base64 n'est pas un chiffrement : tout le monde peut le décoder.</p>
-    </details>
+      function ligneCopie(zone, nom, valeur) {
+        var d = el("div", "ligne-copie");
+        if (nom) d.appendChild(el("span", null, nom));
+        d.appendChild(el("code", null, valeur));
+        var b = el("button", "mini-btn", "Copier");
+        b.type = "button";
+        b.onclick = function () { copier(valeur, b, "Copier"); };
+        d.appendChild(b);
+        zone.appendChild(d);
+      }
 
-    <details class="carte outil" id="outil-json" data-cat="Programmation" data-mots="json formater verifier minifier validateur">
-      <summary>🧾 Formateur JSON</summary>
-      <label for="json-entree">JSON</label><textarea id="json-entree" class="conv-texte" placeholder='{"nom":"Daniel","outils":["HTML","CSS"]}'></textarea>
-      <div class="outils-rangee" id="json-boutons"></div><p class="sous-titre" id="json-msg" role="status"></p>
-      <label for="json-sortie">Résultat</label><textarea id="json-sortie" class="conv-texte" readonly></textarea>
-      <div class="outils-rangee"><button id="json-copier" type="button">Copier le résultat</button></div>
-    </details>
+      function ligneSimple(zone, nom, valeur) {
+        var d = el("div");
+        d.appendChild(el("span", null, nom));
+        d.appendChild(el("b", null, valeur));
+        zone.appendChild(d);
+      }
 
-    <details class="carte outil" id="outil-couleur" data-cat="Web" data-mots="couleur hex rgb hsl css palette">
-      <summary>🎨 Couleurs HEX, RGB et HSL</summary>
-      <label for="col-pick">Choisis une couleur</label><input id="col-pick" type="color" value="#ffa500">
-      <label for="col-hex">Code HEX</label><input id="col-hex" value="#ffa500" autocomplete="off">
-      <p class="erreur" id="col-erreur" role="alert"></p><div class="apercu-couleur" id="col-apercu"></div><div class="resultat" id="col-sortie"></div>
-    </details>
+      // Protège chaque outil : une erreur n'arrête pas les autres
+      function essayer(idCarte, fonction) {
+        try { fonction(); } catch (e) {
+          var message = e && e.message ? e.message : String(e);
+          erreursPage.push(idCarte + " : " + message);
+          var carte = $(idCarte);
+          if (carte) carte.appendChild(el("p", "erreur", "Cet outil a rencontré un problème : " + message));
+        }
+      }
 
-    <details class="carte outil" id="outil-calc" data-cat="Calcul" data-mots="calculatrice calcul addition multiplication division">
-      <summary>🧮 Calculatrice</summary><div class="calc-ecran" id="calc-ecran" aria-live="polite">0</div><div class="calc-grille" id="calc-grille"></div>
-      <p class="source">La calculatrice accepte les opérations simples et les parenthèses. N'effectue pas d'opérations financières certifiées.</p>
-    </details>
+      /* ===== 1. Générateur de mot de passe ===== */
+      essayer("outil-mdp", function () {
+        var mode = $("mdp-mode"), longEl = $("mdp-long"), longVal = $("mdp-long-val");
+        var options = $("mdp-options"), cMaj = $("mdp-maj"), cMin = $("mdp-min");
+        var cChi = $("mdp-chi"), cSym = $("mdp-sym"), cAmb = $("mdp-amb"), nb = $("mdp-nb");
+        var sortie = $("mdp-sortie"), barre = $("mdp-barre"), force = $("mdp-force");
+        var erreurMdp = $("mdp-erreur"), securite = $("mdp-securite");
 
-    <details class="carte outil" id="outil-pct" data-cat="Calcul" data-mots="pourcentage remise prix benefice hausse variation">
-      <summary>％ Pourcentages et remises</summary>
-      <label for="pct-a">Nombre A</label><input id="pct-a" inputmode="decimal" value="20">
-      <label for="pct-b">Nombre B</label><input id="pct-b" inputmode="decimal" value="150">
-      <div class="resultat" id="pct-sortie"></div>
-      <p class="source">Calcule A % de B, le prix après remise ou hausse, et la part de A dans B.</p>
-    </details>
+        var rngSur = !!(window.crypto && window.crypto.getRandomValues);
+        if (!rngSur) {
+          securite.textContent = "Ton navigateur n'offre pas de générateur aléatoire sécurisé : ces mots de passe sont moins forts. Mets à jour ton navigateur (ou Android System WebView).";
+        }
 
-    <details class="carte outil" id="outil-notes" data-cat="Texte" data-mots="bloc-notes notes memo ecrire">
-      <summary>📝 Bloc-notes</summary><textarea id="notes" class="notes" placeholder="Écris tes notes ici. Elles restent sur cet appareil."></textarea>
-      <p class="stats" id="notes-stats"></p><div class="outils-rangee">
-        <button id="notes-copier" type="button">Copier</button><button id="notes-telecharger" type="button">Télécharger (.txt)</button><button id="notes-effacer" type="button">Effacer</button>
-      </div>
-      <p class="source">Les notes sont enregistrées dans le stockage local de ce navigateur. Télécharge les notes importantes.</p>
-    </details>
+        function alea(n) {
+          if (rngSur) {
+            var t = new Uint32Array(1);
+            var limite = Math.floor(4294967296 / n) * n;
+            do { window.crypto.getRandomValues(t); } while (t[0] >= limite);
+            return t[0] % n;
+          }
+          return Math.floor(Math.random() * n);
+        }
 
-    <details class="carte outil" id="outil-texte" data-cat="Texte" data-mots="texte majuscules minuscules accents slug trier convertisseur">
-      <summary>🔤 Convertisseur de texte</summary>
-      <label for="txt-entree">Ton texte</label><textarea id="txt-entree" class="conv-texte" placeholder="Colle ou écris ton texte..."></textarea>
-      <p class="stats" id="txt-stats"></p><div class="outils-rangee" id="txt-boutons"></div>
-      <label for="txt-sortie">Résultat</label><textarea id="txt-sortie" class="conv-texte" readonly></textarea>
-      <div class="outils-rangee"><button id="txt-copier" type="button">Copier le résultat</button><button id="txt-reprendre" type="button">Reprendre le résultat</button></div>
-    </details>
-  </div>
-</main>
-<footer><p>© <span id="annee"></span> Rwagaza Tech Solution — Apprendre, créer et progresser.</p></footer>
-
-<script>
-(() => {
-  "use strict";
-  const $ = id => document.getElementById(id);
-  const outils = [...document.querySelectorAll(".outil")];
-  const cats = ["Tous", ...new Set(outils.map(o => o.dataset.cat))];
-  let categorie = "Tous";
-  const filtres = $("filtres-outils");
-  cats.forEach(cat => {
-    const b = document.createElement("button"); b.type = "button"; b.textContent = cat;
-    b.className = "mini-btn"; b.setAttribute("aria-pressed", String(cat === categorie));
-    b.addEventListener("click", () => { categorie = cat; filtrer(); });
-    filtres.appendChild(b);
-  });
-  function filtrer() {
-    const q = $("rech-outil").value.trim().toLocaleLowerCase("fr");
-    let n = 0;
-    outils.forEach(o => {
-      const match = (categorie === "Tous" || o.dataset.cat === categorie) &&
-        (o.textContent + " " + o.dataset.mots).toLocaleLowerCase("fr").includes(q);
-      o.hidden = !match; if (match) n++;
-    });
-    [...filtres.children].forEach(b => b.setAttribute("aria-pressed", String(b.textContent === categorie)));
-    $("compteur-outils").textContent = `${n} outil${n > 1 ? "s" : ""} affiché${n > 1 ? "s" : ""} sur ${outils.length}.`;
-  }
-  $("rech-outil").addEventListener("input", filtrer); filtrer();
-  $("annee").textContent = new Date().getFullYear();
-
-  const copie = async texte => {
-    try { await navigator.clipboard.writeText(texte); return true; }
-    catch {
-      const t = document.createElement("textarea"); t.value = texte; document.body.appendChild(t); t.select();
-      let ok = false; try { ok = document.execCommand("copy"); } catch {}
-      t.remove(); return ok;
-    }
-  };
-  function ligne(valeur, label="Copier") {
-    const row = document.createElement("div"); row.className = "ligne-copie";
-    const code = document.createElement("code"); code.textContent = valeur;
-    const btn = document.createElement("button"); btn.type = "button"; btn.className = "mini-btn"; btn.textContent = label;
-    btn.addEventListener("click", async () => { btn.textContent = await copie(valeur) ? "Copié !" : "Échec"; setTimeout(() => btn.textContent = label, 1400); });
-    row.append(code, btn); return row;
-  }
-  const nombre = v => Number(String(v).trim().replace(",", "."));
-  const fmt = n => Number.isFinite(n) ? n.toLocaleString("fr-FR", {maximumFractionDigits:8}) : "—";
-
-  // Générateur de mot de passe
-  const mdpLong = $("mdp-long");
-  mdpLong.addEventListener("input", () => $("mdp-long-val").textContent = mdpLong.value);
-  $("mdp-mode").addEventListener("change", () => {
-    const pin = $("mdp-mode").value === "pin"; $("mdp-options").hidden = pin;
-    mdpLong.min = pin ? 4 : 8; if (+mdpLong.value < +mdpLong.min) mdpLong.value = mdpLong.min;
-    $("mdp-long-val").textContent = mdpLong.value;
-  });
-  function randomIndex(max) {
-    const a = new Uint32Array(1); const limite = Math.floor(0x100000000 / max) * max;
-    do { crypto.getRandomValues(a); } while (a[0] >= limite);
-    return a[0] % max;
-  }
-  function genererMdp() {
-    const pin = $("mdp-mode").value === "pin", len = +mdpLong.value;
-    let groupes = pin ? ["0123456789"] : [
-      $("mdp-maj").checked ? "ABCDEFGHJKLMNPQRSTUVWXYZ" : "",
-      $("mdp-min").checked ? "abcdefghijkmnopqrstuvwxyz" : "",
-      $("mdp-chi").checked ? "23456789" : "",
-      $("mdp-sym").checked ? "!@#$%^&*()-_=+[]{};:,.?" : ""
-    ].filter(Boolean);
-    if (!pin && !$("mdp-amb").checked) groupes = [
-      $("mdp-maj").checked ? "ABCDEFGHIJKLMNOPQRSTUVWXYZ" : "",
-      $("mdp-min").checked ? "abcdefghijklmnopqrstuvwxyz" : "",
-      $("mdp-chi").checked ? "0123456789" : "",
-      $("mdp-sym").checked ? "!@#$%^&*()-_=+[]{};:,.?" : ""
-    ].filter(Boolean);
-    if (!groupes.length) { $("mdp-erreur").textContent = "Choisis au moins un type de caractère."; return; }
-    if (!crypto || !crypto.getRandomValues) { $("mdp-erreur").textContent = "Ton navigateur ne prend pas en charge le générateur sécurisé."; return; }
-    $("mdp-erreur").textContent = ""; const alphabet = [...new Set(groupes.join(""))];
-    const resultat = [];
-    for (let k=0; k<+$("mdp-nb").value; k++) {
-      const chars = groupes.map(g => g[randomIndex(g.length)]);
-      while (chars.length < len) chars.push(alphabet[randomIndex(alphabet.length)]);
-      for (let i=chars.length-1;i>0;i--) { const j=randomIndex(i+1); [chars[i],chars[j]]=[chars[j],chars[i]]; }
-      resultat.push(chars.slice(0,len).join(""));
-    }
-    $("mdp-sortie").replaceChildren(...resultat.map(v => ligne(v)));
-    const bits = len * Math.log2(alphabet.length); const score = Math.min(100, bits/1.28);
-    $("mdp-barre").style.width = score+"%"; $("mdp-barre").style.background = score<35?"#d44":score<65?"#e6a23c":"#2aaf70";
-    $("mdp-force").textContent = `Entropie théorique approximative : ${Math.round(bits)} bits.`;
-  }
-  $("mdp-generer").addEventListener("click", genererMdp); genererMdp();
-
-  // Testeur indicatif
-  $("test-voir").addEventListener("change", e => $("test-mdp").type = e.target.checked ? "text" : "password");
-  $("test-mdp").addEventListener("input", () => {
-    const p = $("test-mdp").value, checks = [
-      [p.length>=12,"Au moins 12 caractères"],[p.length>=16,"Idéalement 16 caractères ou plus"],
-      [/[a-z]/.test(p),"Une minuscule"],[/[A-Z]/.test(p),"Une majuscule"],
-      [/\d/.test(p),"Un chiffre"],[/[^A-Za-z0-9]/.test(p),"Un symbole"],
-      [!/(.)\1{2,}/.test(p),"Éviter les répétitions"]
-    ];
-    let score = checks.filter(x=>x[0]).length; if (/(password|azerty|qwerty|123456|admin)/i.test(p)) score=0;
-    const pct = p ? score/checks.length*100 : 0;
-    $("test-barre").style.width=pct+"%"; $("test-barre").style.background=pct<40?"#d44":pct<75?"#e6a23c":"#2aaf70";
-    $("test-niveau").textContent = !p ? "Saisis un exemple pour voir l'estimation." : score<3?"Faible":score<5?"Moyen":score<7?"Bon":"Très bon";
-    $("test-conseils").replaceChildren(...checks.map(([ok,t])=>{const li=document.createElement("li");li.textContent=(ok?"✓ ":"○ ")+t;return li;}));
-  });
-
-  // Hash SHA via Web Crypto
-  a
+        function creer(longueur, jeux) {
+          var tout = jeux.join("");
+          var res = [];
+          jeux.
